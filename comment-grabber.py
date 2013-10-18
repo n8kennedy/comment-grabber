@@ -35,7 +35,7 @@ def grab(lines, inline, blockStart, blockEnd, acc = None):
     return []
   else if inline.match( lines[0] ):
     o = [ lines[0] ]
-    o.extend(grab( lines[1:], inline, blockStart, blockEnd) )
+    o.extend( grab( lines[1:], inline, blockStart, blockEnd) )
     return o
   else if acc is not None and blockEnd.match(lines[0]):
     acc.append( lines[0] )
