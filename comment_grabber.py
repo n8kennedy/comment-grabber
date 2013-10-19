@@ -3,32 +3,21 @@
   Nate Kennedy
   2013-10-18
 
-  get the comment lines from a file
-
-  core function: take file and a structure of regexes (need to accomodate the
-  inline comment markers, and the start and end of blocks; could do keyword
-  and assume only one inline, one block start, and one block end per language)
-
-  get index of each line in file matching our regexes, one list each for
-  inlines, block starts and block ends
-
-  block starts and block ends have to be matched up so that the lines in
-  between them are appropriately grabbed
-
-  then just select out all the indexed lines from the file; return as a list
-  of lines
-
-  took a recursive approach
+  read a collection of files and, based on each file's extension, try to parse
+  out any commented text.  Understands python, javascript, c-sharp, and html
 """
 
 map = {
-  ".js": [ '\/\/', '\/\*', '\*\/' ],
-  ".py": [ '#', '"""', '"""' ],
-  ".cs": [ '\/\/', '\/\*', '\*\/' ],
-  ".html": [ None, '<!--', '-->' ]
+  '.js': [ '\/\/', '\/\*', '\*\/' ],
+  '.py': [ '#', '"""', '"""' ],
+  '.cs': [ '\/\/', '\/\*', '\*\/' ],
+  '.html': [ None, '<!--', '-->' ],
+  '.css' : [ None, '\/\*', '\*\/' ],
+  '.asp' : [ '\'', None, None ]
 }
 
 def main(**kwargs):
+  import sys
   def _orNull(key):
     if kwargs.has_key(key):
       return kwargs[key]
@@ -36,14 +25,15 @@ def main(**kwargs):
       return None
 
   # unpack args
-  file = _orNull('file')
+  files = _orNull('files')
 
-  type, lines = get_type_and_lines(file)
-
-  inline, blockStart, blockEnd = get_patterns(type)
-  print file
-  for l in grab(lines, inline, blockStart, blockEnd):
-    print l
+  for fil in files:
+    type, lines = get_type_and_lines(fil)
+    inline, blockStart, blockEnd = get_patterns(type)
+    print
+    print fil
+    for l in iter_grab(lines, inline, blockStart, blockEnd):
+      print l
 
 def get_type_and_lines(filename):
   from os import path
@@ -70,33 +60,31 @@ def check(re, l):
   else:
     return not re.search(l) is None
 
-def grab(lines, inline, blockStart, blockEnd, acc = None):
+def iter_grab(lines, inline, blockStart, blockEnd):
   if blockStart is not None and blockEnd is None:
     raise Exception("block marker mismatch")
 
-  if lines is None or len(lines) == 0:
-    return []
-  elif check( inline, lines[0] ):
-    o = [ lines[0].strip() ]
-    o.extend( grab( lines[1:], inline, blockStart, blockEnd ) )
-    return o
-  elif acc is not None and check( blockEnd, lines[0] ):
-    acc.append( lines[0].strip() )
-    acc.extend( grab( lines[1:], inline, blockStart, blockEnd ) )
-    return acc
-  elif acc is not None:
-    acc.append( lines[0].strip() )
-    return grab( lines[1:], inline, blockStart, blockEnd, acc )
-  elif check( blockStart, lines[0] ):
-    if check(blockEnd, lines[0]):
-      o = [ lines[0].strip() ]
-      o.extend( grab(lines[1:], inline, blockStart, blockEnd))
-      return o
-    else:
-      return grab(lines[1:], inline, blockStart, blockEnd, [ lines[0].strip() ])
-  else:
-    return grab( lines[1:], inline, blockStart, blockEnd )
+  acc = []
+  block = None
+
+  for l in lines:
+    if check(inline, l):
+      acc.append(l.strip())
+    elif block is not None and check(blockEnd, l):
+      block.append(l.strip())
+      acc.extend(block)
+      block = None
+    elif block is not None:
+      block.append(l.strip())
+    elif check(blockStart, l):
+      if check(blockEnd, l):
+        acc.append(l.strip())
+      else:
+        block = [l.strip()]
+
+  return acc
 
 if __name__ == '__main__':
   import sys, os
-  main(file = os.path.abspath(sys.argv[1]))
+  files = [f for f in sys.argv[1:] if f[0] != '-']
+  main(files = files)
