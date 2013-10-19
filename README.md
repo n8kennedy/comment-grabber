@@ -4,9 +4,11 @@ Comment Grabber
 A simple python script to grep comments from code files.
 
 installation:
+
   $ python setup.py install
 
 usage:
+
 $ comments file[ file2...]
 
 $ comments file.js
