@@ -117,7 +117,11 @@ def iter_grab(lines, inline, blockStart, blockEnd):
 
   return acc
 
-if __name__ == '__main__':
-  import sys, os
+def setuptools_main():
+  """entry point function for setup tools"""
+  import sys
   files = [f for f in sys.argv[1:] if f[0] != '-']
   main(*files)
+
+if __name__ == '__main__':
+  setuptools_main()
