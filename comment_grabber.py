@@ -22,9 +22,9 @@
 """
 
 map = {
-  ".js": [ '//', '/*', '*/' ],
+  ".js": [ '\/\/', '\/\*', '\*\/' ],
   ".py": [ '#', '"""', '"""' ],
-  ".cs": [ '//', '/*', '*/' ],
+  ".cs": [ '\/\/', '\/\*', '\*\/' ],
   ".html": [ None, '<!--', '-->' ]
 }
 
@@ -88,7 +88,12 @@ def grab(lines, inline, blockStart, blockEnd, acc = None):
     acc.append( lines[0].strip() )
     return grab( lines[1:], inline, blockStart, blockEnd, acc )
   elif check( blockStart, lines[0] ):
-    return grab( lines[1:], inline, blockStart, blockEnd, [ lines[0].strip() ] )
+    if check(blockEnd, lines[0]):
+      o = [ lines[0].strip() ]
+      o.extend( grab(lines[1:], inline, blockStart, blockEnd))
+      return o
+    else:
+      return grab(lines[1:], inline, blockStart, blockEnd, [ lines[0].strip() ])
   else:
     return grab( lines[1:], inline, blockStart, blockEnd )
 
