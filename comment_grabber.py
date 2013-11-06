@@ -23,7 +23,8 @@ map = {
   '.html': [ None, '<!--', '-->' ],
   '.css' : [ None, '/\*', '*\/' ],
   '.asp' : [ '\'', '<!--', '-->' ],
-  '.lisp' : [ ';', None, None ]
+  '.lisp' : [ ';', None, None ],
+  '.clj' : [ ';', None, None ]
 }
 
 def main(*files):
@@ -125,3 +126,4 @@ def setuptools_main():
 
 if __name__ == '__main__':
   setuptools_main()
+
