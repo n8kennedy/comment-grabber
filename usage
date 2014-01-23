@@ -1,0 +1,27 @@
+
+comment_grabber.py
+"""
+c#: .cs
+"""
+'.py': [ '#', '^\s*"""', '"""\s*$' ],
+"""iterate over a list of filenames, trying to print commented lines from
+each file.  if a file can't be parsed, print an error and move on"""
+"""get a file's extension and each line in the file, as a list.
+
+return: (extension, lines)"""
+"""check our pattern map for an entry keyed by extension.  if we find a
+match, return a tuple of three regular expressions; otherwise, raise an error
+
+return: ( inline, blockStart, blockEnd )"""
+"""return true if a line contains a match for a regular expression.
+if re is None (or not an re), simply return false"""
+"""iterate thru lines, checking each against the provided regexes.  if a
+line matches inline, append it to acc.  if a line matches blockStart, begin a
+sub-accumulator, into which all lines up to the next match for blockEnd will
+be added.  when blockEnd is hit, extend our sub-accumulator into our primary,
+and set the sub-acc to None.  Any lines not matching inline or between the
+start and end of a block, will not be returned.
+
+regexes can be None, but if blockStart is provided, blockEnd must ALSO be
+provided; otherwise an exception is raised """
+"""entry point function for setup tools"""
